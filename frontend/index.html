@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SlideSync - Convert Jira to PPT</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <script src="https://cdn.jsdelivr.net/gh/gitbrent/PptxGenJS@3.12.0/dist/pptxgen.bundle.js"></script>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen flex items-center justify-center font-sans">
+
+    <div class="w-full max-w-xl bg-slate-800 p-8 rounded-xl shadow-2xl border border-slate-700 mx-4">
+        
+        <div class="mb-6">
+            <h1 class="text-2xl font-bold text-sky-400 flex items-center gap-2">
+                汇 SlideSync
+            </h1>
+            <p class="text-sm text-slate-400 mt-1">
+                Paste your messy Jira/DevOps updates. Download a clean Friday corporate PPT slide instantly.
+            </p>
+        </div>
+        
+        <div class="space-y-4">
+            <div>
+                <label for="jiraInput" class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">
+                    Raw Updates / Ticket Logs
+                </label>
+                <textarea 
+                    id="jiraInput"
+                    class="w-full h-44 p-4 bg-slate-900 border border-slate-700 rounded-lg text-sm focus:outline-none focus:border-sky-500 text-slate-200 placeholder-slate-500 resize-none transition"
+                    placeholder="Example:&#10;- Fixed auth token expiration bug in production&#10;- Completed code review for payment gateway migration&#10;- Ran latency tests on regional DB cluster"
+                ></textarea>
+            </div>
+
+            <button 
+                id="generateBtn"
+                class="w-full bg-sky-500 hover:bg-sky-600 disabled:bg-slate-700 disabled:text-slate-400 disabled:cursor-not-allowed text-white font-medium py-3 rounded-lg transition shadow-md flex items-center justify-center gap-2"
+            >
+                <span id="btnText">⚡ Convert to PowerPoint (.pptx)</span>
+            </button>
+        </div>
+
+        <div class="mt-6 p-4 bg-slate-950 rounded-lg border border-slate-800 text-center">
+            <p class="text-xs text-slate-400 font-medium">🔒 100% Enterprise Compliance Guardrails</p>
+            <p class="text-[11px] text-slate-500 mt-1">
+                Processed via enterprise API endpoints. No data logs are saved, stored, or trained.
+            </p>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
