@@ -19,7 +19,7 @@ const usageDatabase = {};
 
 app.post('/api/summarize', async (expressReq, expressRes) => {
     try {
-        const { text, userId } = expressReq.body;
+        const { text, userId, reportMode = "detailed" } = expressReq.body;
 
         if (!text || !userId) {
             return expressRes.status(400).json({ error: "Missing required fields: text or userId." });
@@ -33,44 +33,102 @@ app.post('/api/summarize', async (expressReq, expressRes) => {
             return expressRes.status(429).json({ error: "Rate limit reached. Maximum 20 uses per day." });
         }
         usageDatabase[userId]++;
-        console.log(`User ${userId} incremented to ${usageDatabase[userId]}/20 uses.`);
+        console.log(`User ${userId} incremented to ${usageDatabase[userId]}/20 uses. Report mode: ${reportMode}`);
 
         // 2. Structural Prompt engineered to build a clean multi-slide JSON schema
-        const structuralPrompt = `
-        You are an expert executive communications agent. Your task is to ingest a massive, chaotic wall of messy developer logs, raw Jira updates, or corporate brain dumps, filter out the noise, and organize the information into a structured, high-level multi-slide presentation layout.
+        let structuralPrompt;
 
-        Instructions:
-        1. Parse the text completely.
-        2. Categorize the items into logical corporate themes or technical focus areas (e.g., Infrastructure Upgrades, Critical Bug Resolutions, Product Pipeline, Operational Administration).
-        3. For each category, write clean, impactful, professional, outcome-oriented executive bullet points. Remove all casual language, complaints, and trivial details.
-        4. Output the results strictly in the specified JSON schema format.
+        if (reportMode === "executive") {
+            // Executive Mode: Concise 2-3 slides with blockers, risks, and action items
+            structuralPrompt = `
+            You are an expert executive communications agent. Your task is to ingest a massive, chaotic wall of messy developer logs, raw Jira updates, or corporate brain dumps, filter out the noise, and organize the information into a concise executive summary (maximum 3 slides).
 
-        Input Messy Data:
-        """
-        ${text}
-        """
+            Instructions:
+            1. Parse the text completely.
+            2. Extract ONLY the most critical information for directors: 
+               - Blockers and risks (what's stopping progress)
+               - Key achievements and progress
+               - Action items requiring director attention
+            3. Create maximum 3 slides:
+               - Slide 1: Executive Summary (key highlights, progress percentage)
+               - Slide 2: Blockers & Risks (critical issues, impact level, what's needed)
+               - Slide 3: Director's Action Items (decisions needed, resources required, next steps)
+            4. Be concise and direct - no fluff, no trivial details
+            5. Output the results strictly in the specified JSON schema format.
 
-        Strict JSON Output Schema Format:
-        {
-          "presentationTitle": "THEME OR PROJECT TITLE HERE",
-          "slides": [
+            Input Messy Data:
+            """
+            ${text}
+            """
+
+            Strict JSON Output Schema Format:
             {
-              "slideTitle": "Category Name 1",
-              "bullets": [
-                "Professional bullet point 1 summarizing matching entries.",
-                "Professional bullet point 2 summarizing matching entries."
-              ]
-            },
-            {
-              "slideTitle": "Category Name 2",
-              "bullets": [
-                "Professional bullet point 1.",
-                "Professional bullet point 2."
+              "presentationTitle": "EXECUTIVE SUMMARY - [PROJECT NAME]",
+              "slides": [
+                {
+                  "slideTitle": "Executive Summary",
+                  "bullets": [
+                    "Overall progress: [X]% complete",
+                    "Key achievements: [2-3 major wins]",
+                    "Timeline status: [on track/at risk/delayed]"
+                  ]
+                },
+                {
+                  "slideTitle": "Critical Blockers & Risks",
+                  "bullets": [
+                    "Blocker 1: [description] - Impact: [high/medium/low] - Needs: [what's required]",
+                    "Risk 1: [description] - Mitigation: [action needed]"
+                  ]
+                },
+                {
+                  "slideTitle": "Director's Action Items",
+                  "bullets": [
+                    "Decision needed: [what director must decide]",
+                    "Resource request: [budget/people/tools needed]",
+                    "Next milestone: [date and deliverable]"
+                  ]
+                }
               ]
             }
-          ]
+            `;
+        } else {
+            // Detailed Mode: Full comprehensive report
+            structuralPrompt = `
+            You are an expert executive communications agent. Your task is to ingest a massive, chaotic wall of messy developer logs, raw Jira updates, or corporate brain dumps, filter out the noise, and organize the information into a structured, high-level multi-slide presentation layout.
+
+            Instructions:
+            1. Parse the text completely.
+            2. Categorize the items into logical corporate themes or technical focus areas (e.g., Infrastructure Upgrades, Critical Bug Resolutions, Product Pipeline, Operational Administration).
+            3. For each category, write clean, impactful, professional, outcome-oriented executive bullet points. Remove all casual language, complaints, and trivial details.
+            4. Output the results strictly in the specified JSON schema format.
+
+            Input Messy Data:
+            """
+            ${text}
+            """
+
+            Strict JSON Output Schema Format:
+            {
+              "presentationTitle": "THEME OR PROJECT TITLE HERE",
+              "slides": [
+                {
+                  "slideTitle": "Category Name 1",
+                  "bullets": [
+                    "Professional bullet point 1 summarizing matching entries.",
+                    "Professional bullet point 2 summarizing matching entries."
+                  ]
+                },
+                {
+                  "slideTitle": "Category Name 2",
+                  "bullets": [
+                    "Professional bullet point 1.",
+                    "Professional bullet point 2."
+                  ]
+                }
+              ]
+            }
+            `;
         }
-        `;
 
         // 3. Request structured data processing from Gemini 2.5 Flash
         const response = await ai.models.generateContent({
