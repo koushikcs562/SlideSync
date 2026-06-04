@@ -3,8 +3,9 @@ services:
   - type: web
     name: slidesync-backend
     env: node
-    buildCommand: cd backend && npm install
-    startCommand: cd backend && npm start
+    rootDirectory: backend
+    buildCommand: npm install
+    startCommand: npm start
     envVars:
       - key: PORT
         value: 5000
@@ -19,8 +20,9 @@ services:
   - type: web
     name: slidesync-frontend
     env: static
+    rootDirectory: frontend
     buildCommand: echo "No build needed"
-    staticPublishPath: ./frontend
+    staticPublishPath: .
     envVars:
       - key: BACKEND_URL
         value: https://slidesync-backend.onrender.com
