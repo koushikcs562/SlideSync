@@ -1,7 +1,7 @@
 // 1. Initialize Supabase Browser Client Connection securely
 // Note: Your custom project URL from your screenshot has been plugged in automatically!
 const SUPABASE_URL = "https://tbdgsvnonmwfklplelru.supabase.co"; 
-const SUPABASE_ANON_KEY = "sb_publishable_pe_4Rt0WVQ2h5tTNuRFIfg__dxqFmrT"; // Paste your real project anon key string here
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRiZGdzdm5vbm13ZmtscGxlbHJ1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkzMzA5NDEsImV4cCI6MjA5NDkwNjk0MX0.Y1SssjnW-1u_YhoXERB1JnyMJeDmQzHwlYQn7F9dlVw";
 
 // Using a unique variable name to completely prevent browser initialization crashes
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
