@@ -429,7 +429,7 @@ document.getElementById('generateBtn').addEventListener('click', async () => {
 
     try {
         // Send actual authenticated unique identity metadata ID code token packet block
-        const networkResponse = await fetch('http://localhost:5000/api/summarize', {
+        const networkResponse = await fetch('https://slidesync-zg71.onrender.com/api/summarize', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
