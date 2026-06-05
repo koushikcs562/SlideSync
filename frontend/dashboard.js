@@ -123,7 +123,8 @@ async function loadUserSubscription() {
             .single();
 
         if (error && error.code !== 'PGRST116') {
-            // If no subscription found, create default free subscription
+            console.error('Subscription query error:', error);
+            // Create default subscription on error
             await createDefaultSubscription();
             return;
         }
@@ -138,7 +139,13 @@ async function loadUserSubscription() {
 
     } catch (error) {
         console.error('Error loading subscription:', error);
-        await createDefaultSubscription();
+        // Set default subscription on error
+        userSubscription = {
+            plan_type: 'free',
+            monthly_limit: 2,
+            decks_used_this_month: 0
+        };
+        updateUpgradeButton();
     }
 }
 
@@ -294,7 +301,12 @@ async function loadPastDecks() {
             .order('created_at', { ascending: false })
             .limit(20);
 
-        if (error) throw error;
+        if (error) {
+            console.error('Error loading decks:', error);
+            renderDecksGrid([]);
+            updateStatistics([]);
+            return;
+        }
 
         renderDecksGrid(decks || []);
         updateStatistics(decks || []);
