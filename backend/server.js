@@ -11,7 +11,11 @@ const PORT = process.env.PORT || 5000;
 // Initialize Google Gen AI SDK with API key from environment
 const ai = new GoogleGenAI(process.env.GOOGLE_API_KEY);
 
-app.use(cors());
+app.use(cors({
+    origin: ['https://slidesync-frontend.onrender.com', 'http://localhost:3000'],
+    methods: ['GET', 'POST'],
+    credentials: true
+}));
 app.use(express.json());
 
 // In-memory simple user usage tracker (Resets on server restart)
